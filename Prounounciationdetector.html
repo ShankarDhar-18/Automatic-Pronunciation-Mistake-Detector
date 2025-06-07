@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRONOUNCIATION MISTAKE DETECTOR</title>
+    <style>
+        body {
+            font-family: 'Arial black', sans-serif;
+            background: linear-gradient(to right, #00912c, #78ffd6);
+            text-align: center;
+            color: rgb(255, 255, 255);
+            margin: 0;
+            padding: 50px;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+            max-width: 450px;
+            margin: auto;
+            color: black;
+        }
+        h2 {
+            color: #007991;
+        }
+        input {
+            width: 80%;
+            padding: 10px;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            outline: none;
+            transition: 0.3s;
+        }
+        input:focus {
+            border-color: #007991;
+        }
+        .result {
+            font-size: 24px;
+            margin-top: 10px;
+        }
+        .correct {
+            color: green;
+            font-weight: bold;
+        }
+        .incorrect {
+            color: red;
+            font-weight: bold;
+        }
+        .suggestion {
+            margin-top: 10px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .btn {
+            background: #007991;
+            color: rgb(196, 183, 130);
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+        .btn:hover {
+            background: #00b4db;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>🔊 Pronunciation Mistake Detector Dev by SSSM TEAM</h2>
+        <input type="text" id="wordInput" placeholder="Type a word..." oninput="checkWord()">
+        <div class="result" id="result"></div>
+        <p class="suggestion" id="suggestion"></p>
+        <div class="button-container">
+            <button class="btn" onclick="speakWord()">🔊 Listen</button>
+            <button class="btn" onclick="startRecognition()">🎙 Speak</button>
+        </div>
+    </div>
+
+    <script>
+        const dictionary = ["apple", "banana", "orange", "grape", "mango","watermelon","banana","red","blue","green","laptop","computer","mouse","washing","cleaning","sweet","speaker","diary","birds","also","charger","bottle","rainbow","cloud","sunshine","season","weather","summer","winter","notebook","telivision","remember","pillow","github","database","remainder","warnning","describe","expert","expired","cycle","scooty","photo","architecture","enough","structure","somnath","soumorick","shankar","bag","dictionary","company","components","register"];
+
+        function checkWord() {
+            let input = document.getElementById("wordInput").value.trim().toLowerCase();
+            let result = document.getElementById("result");
+            let suggestion = document.getElementById("suggestion");
+
+            if (input === "") {
+                result.innerHTML = "";
+                suggestion.innerHTML = "";
+                return;
+            }
+
+            if (dictionary.includes(input)) {
+                result.innerHTML = "✅ Correct!";
+                result.className = "result correct";
+                suggestion.innerHTML = "";
+            } else {
+                result.innerHTML = "❌ Wrong!";
+                result.className = "result incorrect";
+                suggestion.innerHTML = "Did you mean: <b>" + getClosestWord(input) + "</b>?";
+            }
+        }
+
+        function getClosestWord(word) {
+            let closest = dictionary.find(w => w.startsWith(word[0])) || "No suggestion";
+            return closest;
+        }
+
+        function speakWord() {
+            let input = document.getElementById("wordInput").value.trim();
+            if (input !== "") {
+                let speech = new SpeechSynthesisUtterance(input);
+                speech.lang = "en-IN"; // Indian English
+                speech.voice = speechSynthesis.getVoices().find(voice => voice.name.includes("Female") && voice.lang === "en-IN") || speechSynthesis.getVoices()[0];
+                window.speechSynthesis.speak(speech);
+            }
+        }
+
+        function startRecognition() {
+            let recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = "en-IN"; // Indian English
+            recognition.start();
+
+            recognition.onresult = function(event) {
+                let spokenWord = event.results[0][0].transcript.toLowerCase().trim();
+                document.getElementById("wordInput").value = spokenWord;
+                checkWord();
+            };
+
+            recognition.onerror = function() {
+                alert("Error recognizing speech. Try again!");
+            };
+        }
+    </script>
+
+</body>
+</html>
